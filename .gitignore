@@ -1,0 +1,49 @@
+# Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code settings
+.vscode/
+
+# Visual Studio working folder
+.vs/
+
+# Rider
+.idea/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Others
+*.DS_Store
+*.swp
+*.bak
+*.tmp
+
+# NuGet
+*.nupkg
+.nuget/
+packages/
+*.snupkg
+
+# Static web assets
+**/wwwroot/staticwebassets.build.json
+**/wwwroot/staticwebassets.development.json
+**/wwwroot/staticwebassets.runtime.json
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# Publish
+publish/

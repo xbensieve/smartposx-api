@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmartPOSX.API\SmartPOSX.API.csproj" />
+    <ProjectReference Include="..\SmartPOSX.Core\SmartPOSX.Core.csproj" />
+    <ProjectReference Include="..\SmartPOSX.Domain\SmartPOSX.Domain.csproj" />
+    <ProjectReference Include="..\SmartPOSX.Infrastructure\SmartPOSX.Infrastructure.csproj" />
+    <ProjectReference Include="..\SmartPOSX.Middleware\SmartPOSX.Middleware.csproj" />
+  </ItemGroup>
+
+</Project>
