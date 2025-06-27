@@ -4,19 +4,20 @@ obj/
 [Bb]uild/
 [Ll]og/
 [Ll]ogs/
-
+out/
 # User-specific files
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
-
+*.sln.ide
 # VS Code settings
 .vscode/
 
 # Visual Studio working folder
 .vs/
-
+*.dbmdl
+*.dbproj.schemaview
 # Rider
 .idea/
 
@@ -33,6 +34,8 @@ ScaffoldingReadMe.txt
 *.nupkg
 .nuget/
 packages/
+project.lock.json
+project.fragment.lock.json
 *.snupkg
 
 # Static web assets
@@ -45,5 +48,21 @@ TestResults/
 *.coverage
 *.coveragexml
 
+#####################################
+# EF Core Migrations snapshots
+#####################################
+Migrations/*.Designer.cs
+Migrations/*ModelSnapshot.cs
+
 # Publish
 publish/
+
+#####################################
+# Local environment files
+#####################################
+.env
+.env.*
+*.local.json
+secrets.json
+# Local configuration files
+.appsettings.json

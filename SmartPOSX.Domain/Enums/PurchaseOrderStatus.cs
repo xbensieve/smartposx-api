@@ -1,10 +1,9 @@
 ﻿namespace SmartPOSX.Domain.Enums
 {
-    public enum OrderStatus
+    public enum PurchaseOrderStatus
     {
         Pending = 0,
         Completed = 1,
-        Cancelled = 2,
-        Refunded = 3
+        Cancelled = 2
     }
 }
