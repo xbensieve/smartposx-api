@@ -12,7 +12,7 @@ using SmartPOSX.Infrastructure.Data;
 namespace SmartPOSX.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250625174104_Init")]
+    [Migration("20250630155359_Init")]
     partial class Init
     {
         /// <inheritdoc />
