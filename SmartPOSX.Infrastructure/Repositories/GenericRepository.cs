@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartPOSX.Core.Interfaces.Repositories;
 using SmartPOSX.Infrastructure.Data;
+using System.Linq.Expressions;
 
 namespace SmartPOSX.Infrastructure.Repositories
 {
@@ -14,34 +15,63 @@ namespace SmartPOSX.Infrastructure.Repositories
             _dbSet = _context.Set<T>();
         }
 
-        public Task AddAsync(T entity)
+        public async Task AddAsync(T entity)
         {
-            throw new NotImplementedException();
+            await _dbSet.AddAsync(entity);
         }
 
         public void Delete(T entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Remove(entity);
         }
 
-        public Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _dbSet.ToListAsync();
         }
 
-        public Task<T?> GetByIdAsync(object id)
+        public async Task<T?> GetByIdAsync(object id)
         {
-            throw new NotImplementedException();
+            return await _dbSet.FindAsync(id);
         }
 
         public IQueryable<T> Query()
         {
-            throw new NotImplementedException();
+            return _dbSet.AsQueryable();
         }
 
         public void Update(T entity)
         {
-            throw new NotImplementedException();
+            _dbSet.Update(entity);
+        }
+        public async Task<IEnumerable<T>> GetPagedAsync(int pageNumber, int pageSize)
+        {
+            return await _dbSet.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.CountAsync(predicate);
+        }
+        public async Task<int> CountAsync()
+        {
+            return await _dbSet.CountAsync();
+        }
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
+        }
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+        public async Task<T?> FindAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet.Where(predicate);
+
+            foreach (var include in includes)
+                query = query.Include(include);
+
+            return await query.FirstOrDefaultAsync();
         }
     }
 }
