@@ -73,5 +73,14 @@ namespace SmartPOSX.Infrastructure.Repositories
 
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            if (entities == null || !entities.Any())
+            {
+                throw new ArgumentException("The collection of entities cannot be null or empty.", nameof(entities));
+            }
+            await _dbSet.AddRangeAsync(entities);
+        }
     }
 }

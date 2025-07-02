@@ -22,6 +22,9 @@ namespace SmartPOSX.Infrastructure.Implementation
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IProductService, ProductService>();
             services.AddAutoMapper(typeof(MappingProfile));
             return services;
         }

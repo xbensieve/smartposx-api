@@ -1,6 +1,10 @@
-﻿namespace SmartPOSX.Core.Interfaces.Services
+﻿using SmartPOSX.Core.DTOs.Common;
+using SmartPOSX.Core.DTOs.Products;
+
+namespace SmartPOSX.Core.Interfaces.Services
 {
-    internal interface IProductService
+    public interface IProductService
     {
+        Task<ApiResponse<object>> CreateProductAsync(CreateProductDto request);
     }
 }

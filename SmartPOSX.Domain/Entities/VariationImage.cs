@@ -11,12 +11,8 @@ namespace SmartPOSX.Domain.Entities
         [MaxLength(500)]
         public string ImageUrl { get; set; }
         [Required]
-        [MaxLength(100)]
-        public string FileName { get; set; }
-        [MaxLength(200)]
-        public string AltText { get; set; }
-        public bool IsPrimary { get; set; }
-        public int? FileSize { get; set; }
+        public string PublicId { get; set; }
+        public bool IsPrimary { get; set; } = false;
         [ForeignKey(nameof(ProductVariationId))]
         public virtual ProductVariation ProductVariation { get; set; }
     }
