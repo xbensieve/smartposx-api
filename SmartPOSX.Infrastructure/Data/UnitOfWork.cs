@@ -1,4 +1,5 @@
-﻿using SmartPOSX.Core.Interfaces;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using SmartPOSX.Core.Interfaces;
 using SmartPOSX.Core.Interfaces.Repositories;
 using SmartPOSX.Domain.Entities;
 using SmartPOSX.Infrastructure.Repositories;
@@ -8,6 +9,7 @@ namespace SmartPOSX.Infrastructure.Data
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
+        private IDbContextTransaction _transaction;
         public IGenericRepository<Employee> Employees { get; }
         public IGenericRepository<Category> Categories { get; }
         public IGenericRepository<Supplier> Suppliers { get; }
@@ -54,6 +56,23 @@ namespace SmartPOSX.Infrastructure.Data
         {
             return await _context.SaveChangesAsync();
         }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+            return _transaction;
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            await _context.Database.CommitTransactionAsync();
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            await _context.Database.RollbackTransactionAsync();
+        }
+
         public void Dispose()
         {
             _context.Dispose();

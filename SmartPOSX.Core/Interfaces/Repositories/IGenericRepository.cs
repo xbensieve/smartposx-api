@@ -11,6 +11,7 @@ namespace SmartPOSX.Core.Interfaces.Repositories
         Task<int> CountAsync(Expression<Func<T, bool>> predicate);
         Task<IEnumerable<T>> GetPagedAsync(int pageNumber, int pageSize);
         Task<IEnumerable<T>> GetAllAsync();
+        Task AddRangeAsync(IEnumerable<T> entities);
         IQueryable<T> Query();
         Task<T?> GetByIdAsync(object id);
         Task AddAsync(T entity);

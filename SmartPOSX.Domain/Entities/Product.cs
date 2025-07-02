@@ -20,6 +20,6 @@ namespace SmartPOSX.Domain.Entities
         public Guid? CategoryId { get; set; }
         [ForeignKey(nameof(CategoryId))]
         public Category? Category { get; set; }
-        public virtual ICollection<ProductVariation> ProductVariations { get; set; }
+        public virtual ICollection<ProductVariation> ProductVariations { get; set; } = new List<ProductVariation>();
     }
 }

@@ -1,4 +1,5 @@
-﻿using SmartPOSX.Core.Interfaces.Repositories;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using SmartPOSX.Core.Interfaces.Repositories;
 using SmartPOSX.Domain.Entities;
 
 namespace SmartPOSX.Core.Interfaces
@@ -24,5 +25,8 @@ namespace SmartPOSX.Core.Interfaces
         IGenericRepository<EmployeeLog> EmployeeLogs { get; }
         IGenericRepository<Payment> Payments { get; }
         Task<int> SaveChangesAsync();
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task CommitTransactionAsync();
+        Task RollbackTransactionAsync();
     }
 }

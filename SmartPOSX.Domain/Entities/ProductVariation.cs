@@ -22,8 +22,8 @@ namespace SmartPOSX.Domain.Entities
         public int Stock { get; set; }
         [ForeignKey(nameof(ProductId))]
         public virtual Product Product { get; set; }
-        public virtual ICollection<VariationAttribute> VariationAttributes { get; set; }
-        public virtual ICollection<VariationImage> VariationImages { get; set; }
+        public virtual ICollection<VariationAttribute> VariationAttributes { get; set; } = new List<VariationAttribute>();
+        public virtual ICollection<VariationImage> VariationImages { get; set; } = new List<VariationImage>();
         public virtual ICollection<OrderItem> OrderItems { get; set; }
         public virtual ICollection<InventoryTransaction> InventoryTransactions { get; set; }
         public virtual ICollection<PurchaseOrderItem> PurchaseOrderItems { get; set; }
