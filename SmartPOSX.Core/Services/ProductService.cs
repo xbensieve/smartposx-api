@@ -1,4 +1,6 @@
-﻿using SmartPOSX.Core.DTOs.Common;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using SmartPOSX.Core.DTOs.Common;
 using SmartPOSX.Core.DTOs.Products;
 using SmartPOSX.Core.Interfaces;
 using SmartPOSX.Core.Interfaces.Services;
@@ -11,24 +13,18 @@ namespace SmartPOSX.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICategoryService _categoryService;
         private readonly IImageService _imageService;
-        public ProductService(IUnitOfWork unitOfWork, ICategoryService categoryService, IImageService imageService)
+        private readonly IMapper _mapper;
+        public ProductService(IUnitOfWork unitOfWork, ICategoryService categoryService, IImageService imageService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _categoryService = categoryService;
             _imageService = imageService;
+            _mapper = mapper;
         }
         public async Task<ApiResponse<object>> CreateProductAsync(CreateProductDto request)
         {
-            if (request == null)
-                return ApiResponse<object>.Fail("Invalid product data.", 400);
-
-            if (string.IsNullOrWhiteSpace(request.Name) || request.BasePrice <= 0 || request.CategoryId == Guid.Empty)
-                return ApiResponse<object>.Fail("Name, BasePrice, and CategoryId are required.");
-
-            if (request.ProductVariations == null || !request.ProductVariations.Any())
-                return ApiResponse<object>.Fail("At least one product variation is required.");
-
             var category = await _categoryService.GetCategoryByIdAsync(request.CategoryId);
+
             if (category?.Data == null)
                 return ApiResponse<object>.Fail("Category not found.");
 
@@ -45,48 +41,20 @@ namespace SmartPOSX.Core.Services
 
             foreach (var variation in request.ProductVariations)
             {
+                var newVariationId = Guid.NewGuid();
+
                 var newVariation = new ProductVariation
                 {
-                    Id = Guid.NewGuid(),
+                    Id = newVariationId,
                     ProductId = newProduct.Id,
                     Sku = GenerateSku(category.Data.Name, variation.Name),
                     Description = variation.Description,
                     Name = variation.Name,
                     Price = variation.Price,
                     Stock = variation.Stock,
-                    VariationAttributes = new List<VariationAttribute>(),
-                    VariationImages = new List<VariationImage>()
+                    VariationAttributes = CreateVariationAttributes(variation.VariationAttributes, newVariationId),
+                    VariationImages = CreateVariationImages(variation.VariationImages, newVariationId)
                 };
-
-                if (variation.VariationAttributes != null)
-                {
-                    foreach (var attribute in variation.VariationAttributes)
-                    {
-                        var newAttribute = new VariationAttribute
-                        {
-                            Id = Guid.NewGuid(),
-                            ProductVariationId = newVariation.Id,
-                            AttributeName = attribute.AttributeName,
-                            AttributeValue = attribute.AttributeValue
-                        };
-                        newVariation.VariationAttributes.Add(newAttribute);
-                    }
-                }
-
-                if (variation.VariationImages != null)
-                {
-                    foreach (var image in variation.VariationImages)
-                    {
-                        var newImage = new VariationImage
-                        {
-                            Id = Guid.NewGuid(),
-                            ProductVariationId = newVariation.Id,
-                            ImageUrl = image.ImageUrl,
-                            PublicId = image.PublicId
-                        };
-                        newVariation.VariationImages.Add(newImage);
-                    }
-                }
 
                 newProduct.ProductVariations.Add(newVariation);
             }
@@ -126,6 +94,71 @@ namespace SmartPOSX.Core.Services
             string sku = $"{category}{productName}{randomChars}";
 
             return sku.Length > length ? sku.Substring(0, length) : sku;
+        }
+
+        private List<VariationAttribute> CreateVariationAttributes(List<CreateVariationAttributeDto>? attributes, Guid variationId)
+        {
+            if (attributes == null || attributes.Count == 0) return new();
+
+            return attributes.Select(attr => new VariationAttribute
+            {
+                Id = Guid.NewGuid(),
+                ProductVariationId = variationId,
+                AttributeName = attr.AttributeName,
+                AttributeValue = attr.AttributeValue
+            }).ToList();
+        }
+
+        private List<VariationImage> CreateVariationImages(List<CreateVariationImageDto>? images, Guid variationId)
+        {
+            if (images == null || images.Count == 0) return new();
+
+            return images.Select(img => new VariationImage
+            {
+                Id = Guid.NewGuid(),
+                ProductVariationId = variationId,
+                ImageUrl = img.ImageUrl,
+                PublicId = img.PublicId
+            }).ToList();
+        }
+
+        public async Task<ApiResponse<List<ProductDto>>> GetProductListAsync()
+        {
+            var products = await _unitOfWork.Products.Query()
+                .Include(p => p.Category)
+                .Include(p => p.ProductVariations)
+                .ThenInclude(v => v.VariationAttributes)
+                .Include(p => p.ProductVariations)
+                .ThenInclude(v => v.VariationImages)
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
+
+            if (productDtos == null || productDtos.Count == 0)
+            {
+                return ApiResponse<List<ProductDto>>.Fail("No products found.");
+            }
+
+            return ApiResponse<List<ProductDto>>.Ok(productDtos, "Products retrieved successfully.");
+        }
+
+        public async Task<ApiResponse<ProductDto>> GetProductByIdAsync(Guid productId)
+        {
+            var product = _unitOfWork.Products.Query()
+                .Include(p => p.Category)
+                .Include(p => p.ProductVariations)
+                .ThenInclude(v => v.VariationAttributes)
+                .Include(p => p.ProductVariations)
+                .ThenInclude(v => v.VariationImages)
+                .FirstOrDefault(p => p.Id == productId);
+            if (product == null)
+            {
+                return ApiResponse<ProductDto>.Fail("Product not found.");
+            }
+
+            var productDto = _mapper.Map<ProductDto>(product);
+
+            return ApiResponse<ProductDto>.Ok(productDto, "Product retrieved successfully.");
         }
     }
 }
