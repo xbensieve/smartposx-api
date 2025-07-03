@@ -11,80 +11,54 @@ namespace SmartPOSX.API.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly IImageService _imageService;
-        public ProductController(IProductService productService, IImageService imageService)
+        public ProductController(IProductService productService)
         {
             _productService = productService;
-            _imageService = imageService;
         }
 
-        [HttpPost("images/upload")]
-        public async Task<IActionResult> UploadImages([FromForm] List<IFormFile> files)
+        [HttpGet]
+        public async Task<IActionResult> Get()
         {
-            if (files == null || !files.Any())
+            var response = await _productService.GetProductListAsync();
+
+            if (response.Success)
             {
-                return BadRequest(new { message = "No files provided." });
+                return Ok(response);
             }
 
-            var results = new List<object>();
-            foreach (var file in files)
+            return BadRequest(response.Message);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            var response = await _productService.GetProductByIdAsync(id);
+
+            if (response.Success)
             {
-                var result = await _imageService.UploadImageAsync(file);
-                if (result != null && result.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    results.Add(new { Url = result.SecureUrl.ToString(), PublicId = result.PublicId });
-                }
+                return Ok(response);
             }
-            return Ok(results);
+
+            return BadRequest(response.Message);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto request)
         {
-            if (request == null)
+
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { message = "Invalid product data." });
+                return BadRequest(ModelState);
             }
 
             var response = await _productService.CreateProductAsync(request);
+
             if (response.Success)
             {
-                return Ok(response.Data);
+                return Ok(response);
             }
+
             return BadRequest(response.Message);
-        }
-
-        [HttpDelete("delete-image/{publicId}")]
-        public async Task<IActionResult> DeleteImage(string publicId)
-        {
-            try
-            {
-                var result = await _imageService.DeleteImageAsync(publicId);
-                return Ok(new { message = "Image deleted", result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-        // GET api/<ProductController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-
-        // PUT api/<ProductController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<ProductController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }
